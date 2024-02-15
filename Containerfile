@@ -1,10 +1,9 @@
 FROM golang:latest AS builder
 WORKDIR /app
 COPY . .
-RUN CGO_ENABLED=0 go build -ldflags="-w -s" -o main
+RUN CGO_ENABLED=0 go build -ldflags="-w -s" -o app
 
-FROM debian:buster-slim
+FROM scratch AS runtime
 WORKDIR /app
-COPY --from=builder /app/main .
-EXPOSE 80
-CMD ["./main"]
+COPY --from=builder /app/app /usr/local/bin/
+ENTRYPOINT ["/usr/local/bin/app"]
