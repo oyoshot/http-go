@@ -3,27 +3,21 @@ package main
 import (
 	"log"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
 )
 
-type HandlerFunc func(w http.ResponseWriter, r *http.Request)
+func setupRouter() *gin.Engine {
+	r := gin.Default()
+	r.GET("/", func(c *gin.Context) {
+		c.String(http.StatusOK, "Hello, world")
+	})
+	return r
+}
 
 func main() {
-	http.HandleFunc("/", NewHandler(helloHandler))
-	if err := http.ListenAndServe(":80", nil); err != nil {
+	r := setupRouter()
+	if err := r.Run(":80"); err != nil {
 		log.Fatal(err)
-	}
-}
-
-func NewHandler(h HandlerFunc) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		h(w, r)
-	}
-}
-
-func helloHandler(w http.ResponseWriter, r *http.Request) {
-	_, err := w.Write([]byte("Hello, go\n"))
-	if err != nil {
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		return
 	}
 }
